@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "databases-analysis"
+name = "databases"
 version = "0.1.0"
 description = ""
 authors = ["joao.camacho <joao.camacho@visionspace.com>"]
 readme = "README.md"
-packages = [{include = "databases_analysis"}]
+packages = [{include = "src"}]
 
 [tool.poetry.dependencies]
 python = "^3.11.8"
@@ -16,6 +16,7 @@ numpy = "^1.26.4"
 pymongo = "^4.7.2"
 psycopg2-binary = "^2.9.9"
 psycopg2 = "^2.9.9"
+ipython = "^8.20.0"
 
 
 [build-system]
