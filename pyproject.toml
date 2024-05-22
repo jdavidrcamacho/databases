@@ -17,7 +17,7 @@ pymongo = "^4.7.2"
 psycopg2-binary = "^2.9.9"
 psycopg2 = "^2.9.9"
 ipython = "^8.20.0"
-
+SQLAlchemy = "^2.0.30"
 
 [build-system]
 requires = ["poetry-core"]
