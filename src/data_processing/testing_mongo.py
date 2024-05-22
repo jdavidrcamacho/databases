@@ -62,9 +62,12 @@ print(f"DB entries: {num_entries}")
 #     print(document)
 
 # # Find documents with specific criteria (filters)
-# query = {"hostname": "attacker"}  # Replace with your desired criteria
-# filtered_documents = collection.find(query)
+query = {"sandbox_id": "398"}  # Replace with your desired criteria
+filtered_documents = collection.find(query)
 
 # # Loop through filtered documents and print them
-# for document in filtered_documents:
-#     print("--", document)
+i = 0
+for document in filtered_documents:
+    i += 1
+    # print("--", document)
+print(f"sandbox_id = 398 entries: {i}")

@@ -1,48 +1,65 @@
 import psycopg2  # type: ignore
+import pandas as pd  # type: ignore
+# import pyarrow.parquet as pq
 
 # Docker container details
 host = "localhost"
-port = 5432
+port = 5433
 database = "database_example"
-user = "postgres"
+user = "root"
 password = "pass123"
-connection_string = f"dbname={database} user={user} password={password} host={host} port={port}"
-print(f"Connecting using: {connection_string}")
+
+connection_string = (f"dbname={database} user={user} password={password} "
+                     f"host={host} port={port}")
+print(f"\nConnecting using: {connection_string}\n")
 
 conn = psycopg2.connect(host=host, port=port, database=database,
                         user=user, password=password)
 
+# Read the Parquet file using pandas
+df = pd.read_parquet("src/data/sandbox.parquet")
+df = df.astype(str)
 
-# try:
-#     # Connect to the database
-#     conn = psycopg2.connect(
-#         host=host, port=port, database=database, user=user, password=password
-#     )
+# Create a cursor object
+cur = conn.cursor()
+table_name = "table_example"
+table_creation = '''
+   CREATE TABLE table_example (
+       stf_id SERIAL PRIMARY KEY,
+       cmd_type TEXT NOT NULL,
+       pool_id TEXT NOT NULL,
+       sandbox_id TEXT NOT NULL,
+       timestamp_str TEXT NOT NULL,
+       hostname TEXT NOT NULL,
+       cmd TEXT NOT NULL,
+       ip TEXT NOT NULL,
+       username TEXT NOT NULL,
+       wd TEXT NOT NULL
+   )
+'''
+cur.execute(table_creation)
 
-#     # Create a cursor object
-#     cur = conn.cursor()
+conn.commit()
+cur.close()
+conn.close()
 
-#     # Execute a query (replace with your desired query)
-#     cur.execute("SELECT * FROM your_table")
+# import sys
+# sys.exit(0)
 
-#     # Fetch results
-#     rows = cur.fetchall()
+# # Define the insert statement with placeholders for data
+# insert_stmt = f"""INSERT INTO {table_name} ({", ".join(df.columns)}) VALUES (%s, %s, ...)"""
 
-#     # Process results (e.g., print data)
-#     for row in rows:
-#         print(row)
+# # Convert pandas DataFrame to a list of tuples (one tuple per row)
+# data_tuples = df.to_records(index=False).tolist()
 
-#     # Commit changes (if necessary)
-#     # conn.commit()
+# # Execute the insert statement with data tuples
+# cur.executemany(insert_stmt, data_tuples)
 
-# except (Exception, psycopg2.Error) as error:
-#     print("Error while connecting to PostgreSQL", error)
+# # Commit the changes
+# conn.commit()
 
-# finally:
-#     # Close the cursor and connection
-#     if cur is not None:
-#         cur.close()
-#     if conn is not None:
-#         conn.close()
+# # Close the cursor and connection
+# cur.close()
+# conn.close()
 
-# print("Connection to PostgreSQL Docker container closed.")
+# print(f"Parquet data uploaded to table {table_name}")
