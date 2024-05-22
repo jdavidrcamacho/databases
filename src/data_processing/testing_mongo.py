@@ -34,7 +34,7 @@ filenames = ["sandbox-396.json", "sandbox-397.json", "sandbox-398.json",
 
 for filename in filenames:
     try:
-        print(f"\nOpening src/data/{filename}")
+        print(f"\nOpening src/data/sandbox/{filename}")
         log_entries: list[dict[str, str]] = []
         with open(f"src/data/{filename}", "r") as f:
             for entry in f:
