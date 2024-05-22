@@ -29,8 +29,7 @@ collection = db["my_collection"]
 collection.drop()  # Drop the collection (deletes all documents)
 
 # Load JSON data
-filenames = ["sandbox-396.json", "sandbox-397.json", "sandbox-398.json",
-             "sandbox-399.json", "sandbox-400.json", "sandbox-401.json"]
+filenames = ["FullData.json"]
 
 for filename in filenames:
     try:

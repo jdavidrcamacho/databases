@@ -31,4 +31,6 @@ df = pd.DataFrame(log_entries)
 df.to_parquet("src/data/FullData.parquet")
 # Non-relational
 with open("src/data/FullData.json", "w") as final:
-    json.dump(log_entries, final)
+    for i in log_entries:
+        json.dump(i, final)
+        final.write("\n")
