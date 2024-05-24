@@ -18,7 +18,6 @@ plt.close('all')
 font = {'size': 25}
 matplotlib.rc('font', **font)
 
-
 # Docker container details
 host = "localhost"
 port = 5433
@@ -30,46 +29,53 @@ table_name = "table_example"
 
 total_count = [1]
 
-i = 10
+i = 100
 
 total_vals_mongo, total_vals_std_mongo = [], []
 total_vals_postgre, total_vals_std_postgre = [], []
+times_mongo, times_postgre = [], []
 
-counts_postgre, times_postgre = [], []
-for _ in range(i):
+for ii in range(i):
     start = time()
     connection_string = (f"dbname={database} user={user} password={password} "
                          f"host={host} port={port}")
     print(f"\nConnecting using: {connection_string}\n")
     conn = psycopg2.connect(host=host, port=port, database=database,
                             user=user, password=password)
-
     cur = conn.cursor()
-    # Connect to your PostgreSQL database (replace details with yours)
-    # Query to select all entries ordered by sandbox_id
+
+    # Define new entry data (replace with your actual values)
+    new_entry = {
+        "timestamp_str": "2024-05-24T10:00:00",
+        "sandbox_id": f"{1000+ii}",
+        "pool_id": "11",
+        "cmd": "echo hello world",
+        "username": "new_user",
+        "wd": "/home/test",
+        "hostname": "my-server",
+        "ip": "192.168.1.10",
+        "cmd_type": "example_entry",
+        "tags": ["test", "example"],
+    }
+
+    # Construct the insert query with placeholders
     query = """
-    SELECT *
-    FROM table_example
-    ORDER BY sandbox_id;
+    INSERT INTO table_example (timestamp_str, sandbox_id, pool_id, cmd,
+                               username, wd, hostname, ip, cmd_type, tags)
+    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
     """
-
-    # Execute the query
-    cur.execute(query)
-
-    # Fetch the count result (should be a single value)
-    count = cur.fetchall()
-
-    # Print the username and count
-    counts_postgre.append(count)
-    times_postgre.append(time()-start)
+    # Prepare the query with data (prevents SQL injection)
+    cur.execute(query, tuple(new_entry.values()))
+    # Commit the changes to the database
+    conn.commit()
+    print("New entry added successfully!")
     # Close the connection
     conn.close()
-print(np.mean(times_postgre), np.std(times_postgre))
+    times_postgre.append(time()-start)
 total_vals_postgre.append(np.mean(times_postgre))
 total_vals_std_postgre.append(np.std(times_postgre))
 
-counts_mongo, times_mongo = [], []
-for _ in range(i):
+for ii in range(i):
     start = time()
     # Connect to MongoDB (with error handling)
     try:
@@ -79,21 +85,34 @@ for _ in range(i):
         exit(1)
     db = client["my_database"]
     collection = db["my_collection"]
-    # Find documents with username 'bob' and count them
-    count = collection.find({}, sort={"$sort": {"sandbox_id": 1}})
-    # Print the result
-    counts_mongo.append(count)
+
+    # Define new entry data (replace with your actual values)
+    new_entry = {
+        "hostname": "attacker",
+        "ip": "10.1.26.23",
+        "timestamp_str": "2024-05-24T10:00:00",  
+        "sandbox_id": f"{1000+ii}",
+        "cmd": "echo hello world",
+        "pool_id": "11",
+        "wd": "/home/test",
+        "cmd_type": "example_entry",
+        "username": "new_user",
+        "tags": ["test", "example"],
+    }
+    # Insert the new entry
+    result = collection.insert_one(new_entry)
+    # Print the inserted document ID
+    print(f"New entry inserted with ID: {result.inserted_id}")
     times_mongo.append(time()-start)
-print(np.mean(times_mongo), np.std(times_mongo))
 total_vals_mongo.append(np.mean(times_mongo))
 total_vals_std_mongo.append(np.std(times_mongo))
 
 plt.rcParams['figure.figsize'] = [15, 10]
 plt.figure()
-plt.title('Sorting a table by id')
+plt.title('Add a new entry')
 
-plt.bar(['postgreSQL', 'mongoDB'], [total_vals_postgre[0],
-                                    total_vals_mongo[0]])
+plt.bar(['postgreSQL', 'mongoDB'],
+        [total_vals_postgre[0], total_vals_mongo[0]])
 plt.errorbar(['postgreSQL', 'mongoDB'],
              [total_vals_postgre[0], total_vals_mongo[0]],
              yerr=[total_vals_std_postgre[0], total_vals_std_mongo[0]],
