@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  # docker run --name postgres_example -p 5432:5432 -h 127.0.0.1 -e POSTGRES_USER=root -e POSTGRES_PASSWORD=pass123 -d postgres
+  postgres:
+    image: postgres:latest
+    container_name: postgres-container
+    restart: always
+    shm_size: 128mb  # Set shared memory limit when using docker-compose
+    ports:
+      - "5432:5432"
+    volumes: 
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: postgres_database  # Database name
+      POSTGRES_USER: root  # Username
+      POSTGRES_PASSWORD: pass123  # Password
+
+  # MongoDB database
+  # docker run -p 27017:27017 --name mongo_example -d mongo
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-container
+    restart: always
+    shm_size: 128mb  # Set shared memory limit when using docker-compose
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db  # Persistent storage for data
+
+volumes:
+  postgres_data: {}
+  mongodb_data: {}
