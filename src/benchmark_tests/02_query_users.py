@@ -18,14 +18,12 @@ plt.close('all')
 font = {'size': 25}
 matplotlib.rc('font', **font)
 
-
 # Docker container details
 host = "localhost"
 port = 5433
-database = "root"
+database = "postgres_database"
 user = "root"
 password = "pass123"
-table_name = "table_example"
 
 # Define the list of usernames
 usernames = ["root", "admin", "vagrant", "None", "student", "user-access",

@@ -4,7 +4,7 @@ from sqlalchemy import create_engine
 
 # Docker container details
 host = "localhost"
-port = 5432
+port = 5433
 database = "postgres_database"
 user = "root"
 password = "pass123"

@@ -19,10 +19,9 @@ matplotlib.rc('font', **font)
 # Docker container details
 host = "localhost"
 port = 5433
-database = "root"
+database = "postgres_database"
 user = "root"
 password = "pass123"
-table_name = "table_example"
 
 total_vals_mongo, total_vals_std_mongo = [], []
 total_vals_postgre, total_vals_std_postgre = [], []

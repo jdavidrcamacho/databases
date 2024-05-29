@@ -36,14 +36,12 @@ for ii in range(num_entries):
         "tags": ["test", "example"],
     })
 
-
 # Docker container details
 host = "localhost"
 port = 5433
-database = "root"
+database = "postgres_database"
 user = "root"
 password = "pass123"
-table_name = "table_example"
 
 # Connecting to database
 conn = psycopg2.connect(host=host, database=database, user=user,
