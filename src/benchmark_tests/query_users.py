@@ -1,5 +1,4 @@
 import psycopg2  # type: ignore
-import pymongo
 from pymongo import MongoClient
 from time import time
 import matplotlib
@@ -32,13 +31,11 @@ total_count = [7261, 2166, 15, 4836, 86, 859,
                4171, 293, 78, 71, 12]
 
 i = 100
-
 total_vals_mongo, total_vals_std_mongo = [], []
 total_vals_postgre, total_vals_std_postgre = [], []
 for u in usernames:
     connection_string = (f"dbname={database} user={user} password={password} "
                          f"host={host} port={port}")
-    print(f"\nConnecting using: {connection_string}\n")
     conn = psycopg2.connect(host=host, port=port, database=database,
                             user=user, password=password)
 
@@ -52,7 +49,6 @@ for u in usernames:
         FROM table_example
         WHERE username = %s;
         """
-
         # Username to search for
         username = u
 
@@ -61,23 +57,15 @@ for u in usernames:
 
         # Fetch the count result (should be a single value)
         count = cur.fetchone()[0]
-
-        # Print the username and count
         counts_postgre.append(count)
         times_postgre.append(time()-start)
     # Close the connection
     conn.close()
-    print(counts_postgre[0], np.mean(times_postgre), np.std(times_postgre))
     total_vals_postgre.append(np.mean(times_postgre))
     total_vals_std_postgre.append(np.std(times_postgre))
 
-    # Connect to MongoDB (with error handling)
-    try:
-        client = MongoClient("localhost", 27017)  # type: ignore
-    except pymongo.errors.ConnectionFailure:
-        print("Error: Could not connect to MongoDB server.")
-        exit(1)
-
+    # Connect to MongoDB 
+    client = MongoClient("localhost", 27017)  # type: ignore
     db = client["my_database"]
     collection = db["my_collection"]
 
@@ -94,27 +82,19 @@ for u in usernames:
         # Print the result
         counts_mongo.append(count)
         times_mongo.append(time()-start)
-    print(counts_mongo[0], np.mean(times_mongo), np.std(times_mongo))
     total_vals_mongo.append(np.mean(times_mongo))
     total_vals_std_mongo.append(np.std(times_mongo))
-
 
 plt.rcParams['figure.figsize'] = [15, 10]
 plt.figure()
 plt.title('Search number of entries of a user')
-# plt.plot(total_count, total_vals_postgre, total_vals_std_postgre)
-#         '.', color='blue', markersize=20, label='postgreSQL')
 plt.errorbar(total_count, total_vals_postgre, total_vals_std_postgre,
              marker='o', color='blue', markersize=8, ls='none',
              label='postgreSQL')
-# plt.plot(total_count, total_vals_mongo,
-#          '.', color='red', markersize=20, label='mongoDB')
 plt.errorbar(total_count, total_vals_mongo, total_vals_std_mongo,
              marker='o', color='red', markersize=8, ls='none', label='mongoDB')
 
 plt.ylabel('Time (s)')
 plt.xlabel('Number of entries')
 plt.legend(loc='upper left')
-# plt.savefig('sunspotsNumber.png', bbox_inches='tight')
 plt.show()
-# plt.close('all')
